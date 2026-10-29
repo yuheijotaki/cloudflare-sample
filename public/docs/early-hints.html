@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Early Hints 検証ノート</title>
+<title>Cloudflare Early Hints</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* レイアウト: 1 カラムの読み物。各セクションは「図 → 図が示す主張 → 根拠」の順。アクセントは Cloudflare のオレンジ 1 色だけ */
+/* レイアウト: 1 カラムの読み物。図は 3 枚、すべて「オリジン → エッジ → ブラウザ」の左から右で統一。アクセントは Cloudflare のオレンジ 1 色 */
 :root {
   --bg: #fbfaf8;
   --surface: #ffffff;
@@ -50,412 +50,237 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-main { max-width: 52rem; margin: 0 auto; }
-header { margin-bottom: 3rem; border-bottom: 1px solid var(--line); padding-bottom: 2rem; }
-.eyebrow {
-  font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--accent); font-weight: 700; margin: 0 0 0.5rem;
-}
-h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.3; margin: 0 0 1rem; text-wrap: balance; }
-h2 { font-size: 1.45rem; margin: 3.5rem 0 1rem; line-height: 1.4; text-wrap: balance; padding-top: 0.5rem; border-top: 3px solid var(--accent); display: inline-block; }
-h3 { font-size: 1.1rem; margin: 2rem 0 0.5rem; }
-p { margin: 0 0 1rem; max-width: 42rem; }
-.lead { font-size: 1.05rem; color: var(--muted); }
-ul, ol { padding-left: 1.4rem; max-width: 42rem; }
-li { margin-bottom: 0.4rem; }
+main { max-width: 48rem; margin: 0 auto; }
+header { margin-bottom: 2.5rem; border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
+h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.3; margin: 0 0 0.8rem; }
+h2 { font-size: 1.35rem; margin: 3rem 0 0.8rem; line-height: 1.4; padding-top: 0.4rem; border-top: 3px solid var(--accent); display: inline-block; }
+p { margin: 0 0 1rem; }
+ul { padding-left: 1.4rem; }
+li { margin-bottom: 0.45rem; }
 code { font-family: var(--font-mono); font-size: 0.88em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 3px; }
-pre {
-  font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.6;
-  background: var(--code-bg); padding: 1rem 1.2rem; border-radius: 6px;
-  overflow-x: auto; margin: 0 0 1.2rem; border-left: 3px solid var(--accent);
-}
-pre code { background: none; padding: 0; font-size: inherit; }
-pre .hl { color: var(--accent); font-weight: 600; }
 figure { margin: 1.5rem 0 2rem; }
-figure svg { display: block; max-width: 100%; height: auto; font-family: var(--font-body); }
 figure .wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
-figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 0.6rem; max-width: 42rem; }
+figure svg { display: block; max-width: 100%; height: auto; font-family: var(--font-body); }
+figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 0.6rem; }
 figcaption strong { color: var(--fg); }
+.table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 1rem 0 1.5rem; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { font-weight: 700; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.04em; }
-.table-wrap { overflow-x: auto; }
 .yes { color: var(--good); font-weight: 700; }
-.no { color: var(--bad); font-weight: 700; }
-.callout {
-  background: var(--accent-soft); border-left: 4px solid var(--accent);
-  padding: 0.9rem 1.2rem; border-radius: 0 6px 6px 0; margin: 1.5rem 0; max-width: 42rem;
-}
+.weak { color: var(--muted); font-weight: 700; }
+.nowrap { white-space: nowrap; }
+.callout { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 0.9rem 1.2rem; border-radius: 0 6px 6px 0; margin: 1.2rem 0; }
 .callout p:last-child { margin-bottom: 0; }
-.refs { font-size: 0.9rem; }
-.refs li { margin-bottom: 0.6rem; }
-a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .src { font-size: 0.8rem; color: var(--muted); }
-.toc { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; padding: 0; list-style: none; font-size: 0.9rem; margin: 1.5rem 0 0; }
-.toc li { margin: 0; }
-.toc a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--line); }
-.toc a:hover { border-color: var(--accent); }
-@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 </style>
 </head>
 <body>
 <main>
 
 <header>
-  <p class="eyebrow">エンジニア勉強会 / 2026-10-29</p>
-  <h1>Cloudflare Early Hints を実際に動かして分かったこと</h1>
-  <p class="lead">103 Early Hints の仕組み、Cloudflare が「オリジンの代わりに」ヒントを出す方法、そして今日の検証で 103 が出た場所と出なかった場所の理由を図で整理する。</p>
-  <ul class="toc">
-    <li><a href="#what">1. Early Hints とは</a></li>
-    <li><a href="#learn">2. Cloudflare の学習方式</a></li>
-    <li><a href="#gate">3. 103 が出る条件</a></li>
-    <li><a href="#browser">4. ブラウザ側の落とし穴</a></li>
-    <li><a href="#verify">5. 確認方法</a></li>
-    <li><a href="#summary">6. まとめ</a></li>
-  </ul>
+  <h1>Cloudflare Early Hints</h1>
+  <p><strong>結論:</strong> ビルドした静的ファイルには効果がほぼない(もともと速い)。コードが時間をかけて生成する応答には効く。</p>
 </header>
 
 <!-- ============================================================ -->
-<h2 id="what">1. Early Hints とは: サーバーの「考え中」の時間を使う</h2>
+<h2>0. 登場人物</h2>
 
-<p>HTML を生成するのに時間がかかるサーバーは、その間ブラウザを待たせている。<a href="https://www.rfc-editor.org/rfc/rfc8297">RFC 8297</a> の <code>103 Early Hints</code> は、本体の <code>200</code> より先に「この CSS とフォントが必要になる」という <code>Link</code> ヘッダーだけを送り、ブラウザにその待ち時間で先読みさせる仕組み。</p>
+<p>Cloudflare を使ったサイトでは、オリジンとブラウザの間に Cloudflare のエッジが入る。エッジは世界中にあり、ユーザーに近い場所でリクエストを受ける。以降の図はすべて「オリジン → エッジ → ブラウザ」の左から右で描く。</p>
 
 <figure>
   <div class="wrap">
-  <svg viewBox="0 0 760 290" role="img" aria-label="Early Hints なしでは CSS の取得が HTML 到着後に始まるが、ありでは 103 到着直後に始まり、HTML 到着時にはすでに手元にある">
+  <svg viewBox="0 0 720 230" role="img" aria-label="オリジン、Cloudflare エッジ、ブラウザが左から右に並ぶ。静的ファイルはエッジがブラウザに返し、コードが生成する応答はオリジンで作られてエッジ経由でブラウザに届く">
+    <defs>
+      <marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+    <!-- origin -->
+    <rect x="20" y="60" width="160" height="70" rx="8" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
+    <text x="100" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">オリジン</text>
+    <text x="100" y="110" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.8">Pages Function などのコード</text>
+
+    <!-- edge -->
+    <rect x="270" y="60" width="180" height="70" rx="8" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)"/>
+    <text x="360" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">Cloudflare エッジ</text>
+    <text x="360" y="110" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.8">静的ファイルはここにある</text>
+
+    <!-- browser -->
+    <rect x="550" y="60" width="150" height="70" rx="8" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
+    <text x="625" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">ブラウザ</text>
+    <text x="625" y="110" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.8">ユーザーの手元</text>
+
+    <!-- request: browser -> edge -> origin (right to left, upper arrows) -->
+    <line x1="548" y1="82" x2="454" y2="82" stroke="currentColor" marker-end="url(#arr0)"/>
+    <text x="500" y="76" font-size="11" text-anchor="middle" fill="currentColor">リクエスト</text>
+    <line x1="268" y1="82" x2="184" y2="82" stroke="currentColor" marker-end="url(#arr0)"/>
+    <!-- response: origin -> edge -> browser (left to right, lower arrows) -->
+    <line x1="182" y1="108" x2="266" y2="108" stroke="currentColor" marker-end="url(#arr0)"/>
+    <line x1="452" y1="108" x2="546" y2="108" stroke="currentColor" marker-end="url(#arr0)"/>
+    <text x="500" y="124" font-size="11" text-anchor="middle" fill="currentColor">応答</text>
+
+    <!-- notes -->
+    <text x="360" y="172" font-size="11" text-anchor="middle" fill="currentColor"><tspan font-weight="700">ビルドした静的ファイル:</tspan> エッジが持っていて、ここで返す</text>
+    <text x="360" y="196" font-size="11" text-anchor="middle" fill="currentColor"><tspan font-weight="700">コードが生成する応答:</tspan> オリジンまで届いて、そこで作られる</text>
+  </svg>
+  </div>
+  <figcaption><strong>静的ファイルはエッジで完結し、コード生成の応答はオリジンまで往復する。</strong> Early Hints はこの往復の待ち時間を埋める仕組みなので、後者にだけ意味がある。</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2>1. 仕組み</h2>
+
+<p>通常、ブラウザは HTML が届くまで何もできない。<code>103 Early Hints</code> は、本体の <code>200</code> より先に <code>Link</code> ヘッダーだけを送り、オリジンが HTML を作っている間にブラウザへ CSS を先読みさせる。</p>
+
+<figure>
+  <div class="wrap">
+  <svg viewBox="0 0 720 200" role="img" aria-label="Early Hints なしでは CSS の取得が HTML 到着後に始まる。ありではエッジが返す 103 の直後に始まり、HTML 到着時には手元にある">
     <defs>
       <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
       </marker>
     </defs>
-    <!-- time axis -->
     <g fill="currentColor" font-size="11" opacity="0.7">
-      <text x="120" y="22">0 ms</text>
-      <text x="162" y="22">70</text>
-      <text x="660" y="22" text-anchor="end">1,100 ms (HTML 到着)</text>
+      <text x="100" y="20">オリジンが生成開始</text>
+      <text x="580" y="20" text-anchor="middle">ブラウザに HTML 到着 (1.1 s)</text>
     </g>
     <g stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="3 3">
-      <line x1="120" y1="28" x2="120" y2="270"/>
-      <line x1="165" y1="28" x2="165" y2="270"/>
-      <line x1="660" y1="28" x2="660" y2="270"/>
+      <line x1="100" y1="26" x2="100" y2="185"/>
+      <line x1="580" y1="26" x2="580" y2="185"/>
     </g>
 
-    <!-- Without -->
-    <text x="12" y="70" font-size="13" font-weight="700" fill="currentColor">なし</text>
-    <text x="12" y="88" font-size="11" fill="currentColor" opacity="0.7">(通常)</text>
-    <rect x="120" y="50" width="540" height="22" rx="3" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-opacity="0.5"/>
-    <text x="390" y="65" font-size="11" text-anchor="middle" fill="currentColor">サーバーが HTML を生成中 (ブラウザは待つだけ)</text>
-    <rect x="660" y="82" width="60" height="22" rx="3" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-opacity="0.5"/>
-    <text x="690" y="97" font-size="11" text-anchor="middle" fill="currentColor">CSS 取得</text>
-    <line x1="724" y1="93" x2="748" y2="93" stroke="currentColor" marker-end="url(#arr)"/>
-    <text x="748" y="123" font-size="11" text-anchor="end" fill="currentColor" opacity="0.8">描画は 1,200 ms 以降</text>
+    <!-- without -->
+    <text x="12" y="66" font-size="13" font-weight="700" fill="currentColor">なし</text>
+    <rect x="100" y="50" width="480" height="24" rx="3" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-opacity="0.4"/>
+    <text x="340" y="66" font-size="11" text-anchor="middle" fill="currentColor">ブラウザは待つだけ</text>
+    <rect x="580" y="50" width="70" height="24" rx="3" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-opacity="0.6"/>
+    <text x="615" y="66" font-size="11" text-anchor="middle" fill="currentColor">CSS 取得</text>
+    <line x1="652" y1="62" x2="690" y2="62" stroke="currentColor" marker-end="url(#arr)"/>
+    <text x="694" y="66" font-size="11" fill="currentColor">描画</text>
 
-    <!-- divider -->
-    <line x1="12" y1="150" x2="748" y2="150" stroke="currentColor" stroke-opacity="0.2"/>
-
-    <!-- With -->
-    <text x="12" y="188" font-size="13" font-weight="700" fill="var(--accent)">あり</text>
-    <text x="12" y="206" font-size="11" fill="currentColor" opacity="0.7">(103)</text>
-    <rect x="120" y="168" width="540" height="22" rx="3" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-opacity="0.5"/>
-    <text x="390" y="183" font-size="11" text-anchor="middle" fill="currentColor">サーバーが HTML を生成中</text>
-    <!-- 103 marker -->
-    <rect x="150" y="200" width="30" height="18" rx="3" fill="var(--accent)"/>
-    <text x="165" y="213" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">103</text>
-    <rect x="186" y="200" width="60" height="18" rx="3" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)"/>
-    <text x="216" y="213" font-size="11" text-anchor="middle" fill="currentColor">CSS 取得</text>
-    <text x="256" y="213" font-size="11" fill="currentColor" opacity="0.8">← HTML を待たずに始まる</text>
-    <line x1="660" y1="228" x2="690" y2="228" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr)"/>
-    <text x="696" y="232" font-size="11" fill="currentColor">即描画</text>
-    <text x="120" y="262" font-size="11" fill="currentColor" opacity="0.8">Link: &lt;/styles.css&gt;; rel=preload; as=style  を 103 で先に受け取る</text>
+    <!-- with -->
+    <text x="12" y="136" font-size="13" font-weight="700" fill="var(--accent)">あり</text>
+    <rect x="100" y="120" width="480" height="24" rx="3" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-opacity="0.4"/>
+    <rect x="128" y="120" width="34" height="24" rx="3" fill="var(--accent)"/>
+    <text x="145" y="136" font-size="11" font-weight="700" text-anchor="middle" fill="#fff">103</text>
+    <rect x="166" y="120" width="70" height="24" rx="3" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)"/>
+    <text x="201" y="136" font-size="11" text-anchor="middle" fill="currentColor">CSS 取得</text>
+    <line x1="582" y1="132" x2="620" y2="132" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="624" y="136" font-size="11" fill="currentColor">描画</text>
+    <text x="128" y="170" font-size="11" fill="currentColor" opacity="0.7">エッジが 70 ms で 103 を返す</text>
   </svg>
   </div>
-  <figcaption><strong>今日の <code>/pages-function</code> での実測。</strong> 103 は約 70 ms、HTML 本体は約 1,100 ms で到着した。差の約 1 秒がそのまま CSS の先読みに使える時間になる。Cloudflare は初回訪問者のページロードで 30% 以上の改善を報告している(<a href="https://blog.cloudflare.com/early-hints/">Cloudflare blog</a>)。</figcaption>
+  <figcaption><strong>103 を受けた時点で CSS の取得が始まる。</strong> 今回の実測では 103 が約 70 ms、HTML 本体が約 1.1 秒で到着した。差の約 1 秒が先読みに使える。</figcaption>
 </figure>
 
-<p>対応はブラウザ側にも必要で、Chrome は 103 以降デフォルトで有効。HTTP/2 または HTTP/3 のみで動作し、HTTP/1.1 では無視される(<a href="https://developer.chrome.com/blog/early-hints/">Chrome Developers</a>)。Safari は <code>preconnect</code> のみ対応で <code>preload</code> は未対応。</p>
-
-<!-- ============================================================ -->
-<h2 id="learn">2. Cloudflare の方式: オリジンは 103 を喋らなくていい</h2>
-
-<p>多くのアプリケーションサーバーは 103 を返せない。Cloudflare の設計は「エッジがオリジンの <code>Link</code> ヘッダーを学習して覚え、次回以降はオリジンに届く前にエッジが 103 を返す」というもの。オリジン側の変更は <code>Link</code> ヘッダーを付けるだけで済む。</p>
-
-<figure>
-  <div class="wrap">
-  <svg viewBox="0 0 760 360" role="img" aria-label="1 回目のリクエストではエッジがオリジンの Link ヘッダーをヒントキャッシュに保存し、2 回目以降はオリジンへ転送する前にそのヒントを 103 として返す">
-    <defs>
-      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
-      </marker>
-      <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
-      </marker>
-    </defs>
-    <!-- lanes -->
-    <g font-size="12" font-weight="700" fill="currentColor" text-anchor="middle">
-      <text x="100" y="24">ブラウザ</text>
-      <text x="380" y="24">Cloudflare エッジ</text>
-      <text x="660" y="24">オリジン / Worker</text>
-    </g>
-    <g stroke="currentColor" stroke-opacity="0.25">
-      <line x1="100" y1="34" x2="100" y2="340"/>
-      <line x1="380" y1="34" x2="380" y2="340"/>
-      <line x1="660" y1="34" x2="660" y2="340"/>
-    </g>
-    <!-- hints cache box on edge lane -->
-    <rect x="320" y="150" width="120" height="34" rx="4" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)"/>
-    <text x="380" y="166" font-size="10.5" text-anchor="middle" fill="currentColor">ヒントキャッシュ</text>
-    <text x="380" y="178" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.8">(URI ごと、クエリ無視)</text>
-
-    <!-- phase 1 label -->
-    <rect x="12" y="48" width="76" height="20" rx="10" fill="currentColor" fill-opacity="0.1"/>
-    <text x="50" y="62" font-size="10.5" text-anchor="middle" fill="currentColor">1 回目: 学習</text>
-    <!-- request -->
-    <line x1="104" y1="70" x2="376" y2="70" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="64" font-size="11" text-anchor="middle" fill="currentColor">GET /pages-function</text>
-    <line x1="384" y1="70" x2="656" y2="70" stroke="currentColor" marker-end="url(#arr2)"/>
-    <!-- response -->
-    <line x1="656" y1="118" x2="384" y2="118" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="520" y="112" font-size="11" text-anchor="middle" fill="currentColor">200 + Link: rel=preload</text>
-    <line x1="376" y1="118" x2="104" y2="118" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="112" font-size="11" text-anchor="middle" fill="currentColor">200 (103 はまだ無い)</text>
-    <!-- store -->
-    <path d="M396,120 C420,135 400,145 390,150" fill="none" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arrA)"/>
-    <text x="450" y="140" font-size="10.5" fill="var(--accent)" font-weight="700">Link を保存</text>
-
-    <!-- phase 2 label -->
-    <rect x="12" y="208" width="76" height="20" rx="10" fill="var(--accent)"/>
-    <text x="50" y="222" font-size="10.5" text-anchor="middle" fill="#fff">2 回目以降</text>
-    <line x1="104" y1="230" x2="376" y2="230" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="224" font-size="11" text-anchor="middle" fill="currentColor">GET /pages-function</text>
-    <!-- 103 immediately -->
-    <line x1="376" y1="256" x2="104" y2="256" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrA)"/>
-    <text x="240" y="250" font-size="11" text-anchor="middle" fill="var(--accent)" font-weight="700">103 + Link (約 70 ms)</text>
-    <!-- forward to origin at same time -->
-    <line x1="384" y1="230" x2="656" y2="230" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="520" y="224" font-size="11" text-anchor="middle" fill="currentColor">同時に転送</text>
-    <!-- origin thinks -->
-    <rect x="652" y="240" width="16" height="60" fill="currentColor" fill-opacity="0.15"/>
-    <text x="676" y="274" font-size="10.5" fill="currentColor" opacity="0.8">生成中 1 s</text>
-    <!-- final response -->
-    <line x1="656" y1="310" x2="384" y2="310" stroke="currentColor" marker-end="url(#arr2)"/>
-    <line x1="376" y1="310" x2="104" y2="310" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="304" font-size="11" text-anchor="middle" fill="currentColor">200 本体 (約 1,100 ms)</text>
-    <text x="520" y="304" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.8">Link が変わっていれば更新</text>
-    <!-- browser preload -->
-    <rect x="14" y="262" width="80" height="30" rx="3" fill="var(--accent)" fill-opacity="0.2" stroke="var(--accent)"/>
-    <text x="54" y="275" font-size="10" text-anchor="middle" fill="currentColor">styles.css を</text>
-    <text x="54" y="287" font-size="10" text-anchor="middle" fill="currentColor">先読み</text>
-  </svg>
-  </div>
-  <figcaption><strong>エッジが <code>Link</code> ヘッダーを学習し、次回からオリジン到達前に 103 を返す。</strong> 今日の検証では、デプロイ後およそ 3 分でヒントが学習され 103 が出始めた。本体の <code>Link</code> が変わるとヒントキャッシュも更新される(<a href="https://developers.cloudflare.com/cache/advanced-configuration/early-hints/">Cache docs</a>)。</figcaption>
-</figure>
-
-<p>学習の対象になるのは次を全て満たすレスポンスだけ(<a href="https://developers.cloudflare.com/cache/advanced-configuration/early-hints/">公式ドキュメント</a>)。</p>
+<p>103 を返しているのはオリジンのコードではなく、エッジ。コード側に Early Hints の記述は一切ない。</p>
 <ul>
-  <li>URI が <code>.html</code> / <code>.htm</code> / <code>.php</code> で終わるか、拡張子なし</li>
-  <li>ステータスが 200 / 301 / 302</li>
-  <li><code>Link</code> ヘッダーに <code>rel=preload</code> または <code>rel=preconnect</code> がある</li>
+  <li>オリジンは、通常の <code>200</code> 応答に <code>Link: &lt;/styles.css&gt;; rel=preload</code> を付けるだけ。</li>
+  <li>エッジは HTML の応答からその <code>Link</code> を覚える(CSS など HTML 以外の応答は見ない)。</li>
+  <li>次回以降、エッジはリクエストをオリジンに転送すると同時に、覚えていた <code>Link</code> を 103 として先に返す。</li>
 </ul>
 
 <!-- ============================================================ -->
-<h2 id="gate">3. 103 が出る条件: 今日の 3 つの環境で何が違ったか</h2>
+<h2>2. 検証: 静的ファイルとコード生成の応答で比べる</h2>
 
-<p>同じ <code>_headers</code> ファイルを使っても、デプロイ先によって結果が変わった。リクエストが 103 を受け取るまでには 3 つの関門がある。</p>
-
-<figure>
-  <div class="wrap">
-  <svg viewBox="0 0 790 330" role="img" aria-label="リクエストは、ゾーンで Early Hints が有効か、CDN キャッシュが HIT でないか、ヒントが学習済みかの 3 つの関門を通ったときだけ 103 を受け取る。workers.dev は最初の関門で、CDN キャッシュ HIT の本番サイトは 2 つ目で止まる">
-    <defs>
-      <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
-      </marker>
-    </defs>
-    <!-- browser -->
-    <rect x="12" y="60" width="90" height="44" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="57" y="86" font-size="12" text-anchor="middle" fill="currentColor">ブラウザ</text>
-    <line x1="102" y1="82" x2="146" y2="82" stroke="currentColor" marker-end="url(#arr3)"/>
-
-    <!-- gate 1 -->
-    <rect x="150" y="48" width="150" height="68" rx="6" fill="var(--surface)" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="225" y="70" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.7">関門 1</text>
-    <text x="225" y="88" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">ゾーンで</text>
-    <text x="225" y="104" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">Early Hints 有効?</text>
-    <line x1="300" y1="82" x2="344" y2="82" stroke="currentColor" marker-end="url(#arr3)"/>
-
-    <!-- gate 2 -->
-    <rect x="348" y="48" width="150" height="68" rx="6" fill="var(--surface)" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="423" y="70" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.7">関門 2</text>
-    <text x="423" y="88" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">CDN キャッシュが</text>
-    <text x="423" y="104" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">MISS (本体が未着)?</text>
-    <line x1="498" y1="82" x2="542" y2="82" stroke="currentColor" marker-end="url(#arr3)"/>
-
-    <!-- gate 3 -->
-    <rect x="546" y="48" width="150" height="68" rx="6" fill="var(--surface)" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="621" y="70" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.7">関門 3</text>
-    <text x="621" y="88" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">ヒントが</text>
-    <text x="621" y="104" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">学習済み?</text>
-    <line x1="696" y1="82" x2="740" y2="82" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr3)"/>
-    <text x="742" y="86" font-size="12" font-weight="700" fill="var(--accent)">103</text>
-
-    <!-- failure annotations -->
-    <g font-size="11" fill="currentColor">
-      <line x1="225" y1="116" x2="225" y2="150" stroke="var(--bad)" stroke-dasharray="4 3"/>
-      <rect x="135" y="152" width="180" height="56" rx="4" fill="var(--bad)" fill-opacity="0.08" stroke="var(--bad)" stroke-opacity="0.6"/>
-      <text x="225" y="172" font-weight="700" text-anchor="middle" fill="var(--bad)">workers.dev で停止</text>
-      <text x="225" y="188" text-anchor="middle">Cloudflare 所有ゾーン。</text>
-      <text x="225" y="202" text-anchor="middle">Speed 設定が触れない</text>
-
-      <line x1="423" y1="116" x2="423" y2="150" stroke="var(--bad)" stroke-dasharray="4 3"/>
-      <rect x="333" y="152" width="180" height="56" rx="4" fill="var(--bad)" fill-opacity="0.08" stroke="var(--bad)" stroke-opacity="0.6"/>
-      <text x="423" y="172" font-weight="700" text-anchor="middle" fill="var(--bad)">本番サイトで停止</text>
-      <text x="423" y="188" text-anchor="middle">HTML が cf-cache-status: HIT。</text>
-      <text x="423" y="202" text-anchor="middle">即答できるので 103 不要</text>
-
-      <line x1="621" y1="116" x2="621" y2="150" stroke="var(--bad)" stroke-dasharray="4 3"/>
-      <rect x="531" y="152" width="180" height="56" rx="4" fill="var(--bad)" fill-opacity="0.08" stroke="var(--bad)" stroke-opacity="0.6"/>
-      <text x="621" y="172" font-weight="700" text-anchor="middle" fill="var(--bad)">デプロイ直後に停止</text>
-      <text x="621" y="188" text-anchor="middle">学習まで約 3 分。</text>
-      <text x="621" y="202" text-anchor="middle">その間は 200 のみ</text>
-    </g>
-
-    <!-- pass row -->
-    <rect x="135" y="240" width="576" height="60" rx="4" fill="var(--good)" fill-opacity="0.08" stroke="var(--good)" stroke-opacity="0.6"/>
-    <text x="150" y="262" font-size="11" font-weight="700" fill="var(--good)">pages.dev は 3 つとも通過</text>
-    <text x="150" y="280" font-size="11" fill="currentColor">Pages は Early Hints が自動で有効(関門 1)、Pages Function の /pages-function は no-store でキャッシュされない(関門 2)、</text>
-    <text x="150" y="294" font-size="11" fill="currentColor">デプロイ 3 分後にヒントが学習済み(関門 3)。静的な / も cf-cache-status が付かず 103 が出た。</text>
-  </svg>
-  </div>
-  <figcaption><strong>103 は 3 つの関門を全て通ったときだけ出る。</strong> 関門 1 は <a href="https://developers.cloudflare.com/cache/advanced-configuration/early-hints/">ゾーン設定</a>(Pages は<a href="https://developers.cloudflare.com/pages/configuration/early-hints/">常時有効</a>)、関門 2 は「本体のレスポンスヘッダーが既にあれば 103 を送らない」という公式の挙動、関門 3 は 2 章の学習。</figcaption>
-</figure>
+<p>同じ Pages プロジェクトに 3 つのページを置いた。静的 HTML、コード生成の HTML、そして比較用に <code>Link</code> を付けないコード生成の HTML。<code>Link</code> ヘッダーの付け方は応答の種類で変わる。</p>
 
 <div class="table-wrap">
 <table>
-  <thead><tr><th>環境</th><th>ゾーン</th><th>Link ヘッダー</th><th>103</th><th>止まった関門</th></tr></thead>
+  <thead><tr><th>URL</th><th>応答の種類</th><th>Link の付け方</th><th>103</th><th>本体の到着</th><th>効果</th></tr></thead>
   <tbody>
-    <tr><td><code>cloudflare-sample.yuheijotaki.workers.dev</code><br><span class="src">Workers 静的アセット + 1 秒遅延の /worker</span></td><td>workers.dev(Cloudflare 所有)</td><td>あり</td><td class="no">出ない</td><td>1</td></tr>
-    <tr><td><code>cloudflare-sample-pages.pages.dev</code><br><span class="src">同じ dist + Pages Function の /pages-function</span></td><td>pages.dev(自動有効)</td><td>あり</td><td class="yes">出る</td><td>なし</td></tr>
-    <tr><td><code>recruit.smarthr.co.jp</code><br><span class="src">Workers + カスタムドメイン、HTML を CDN キャッシュ</span></td><td>smarthr.co.jp(自社)</td><td>あり(preconnect)</td><td class="no">観測できず</td><td>2(外からは 1 と区別不能)</td></tr>
+    <tr>
+      <td><code>/</code></td>
+      <td>ビルドした静的 HTML</td>
+      <td><code>public/_headers</code> の <code>/*</code> ルール</td>
+      <td class="yes nowrap">出る</td>
+      <td>約 100 ms</td>
+      <td class="weak">ほぼなし。本体がすぐ届くので先読みの出番がない</td>
+    </tr>
+    <tr>
+      <td><code>/pages-function</code></td>
+      <td><code>functions/</code> のコードが 1 秒かけて生成</td>
+      <td>コード内で <code>Response</code> に付ける(<code>_headers</code> は Function の応答には効かない)</td>
+      <td class="yes nowrap">出る</td>
+      <td>約 1.1 s</td>
+      <td class="yes">あり。CSS の取得開始が約 1 秒早まる</td>
+    </tr>
+    <tr>
+      <td><code>/pages-function-no-hints</code></td>
+      <td>同上(比較用)</td>
+      <td>付けない</td>
+      <td class="weak nowrap">出ない</td>
+      <td>約 1.1 s</td>
+      <td class="weak">なし。CSS の取得は HTML 到着後に始まる</td>
+    </tr>
   </tbody>
 </table>
 </div>
 
 <div class="callout">
-  <p><strong>本番サイトで 103 が出ないのは故障ではない。</strong> HTML が CDN キャッシュから数十 ms で返るなら、103 を先に送る意味がない。Early Hints が効くのは「生成に時間がかかり、キャッシュできないページ」。SSR 応答や、キャッシュ MISS になった POP の初回リクエストがそれに当たる。</p>
+  <p>「103 が出る」と「効く」は別。静的ファイルでも 103 は出るが、本体が 100 ms で届くので稼げる時間がない。効くのは本体の生成に時間がかかる応答だけ。</p>
 </div>
 
-<!-- ============================================================ -->
-<h2 id="browser">4. ブラウザ側の落とし穴: 先読みしたものがキャッシュで使えるか</h2>
-
-<p>サーバーが 103 を返し、Chrome がそれを受け取っても、まだ効かないケースがあった。Chrome は 103 で指定されたリソースを HTTP キャッシュに入れ、HTML を解析して同じ URL が必要になった時点でキャッシュから取り出す。この取り出しが「新鮮なキャッシュ」として成立するかは、リソース側の <code>Cache-Control</code> で決まる。</p>
+<p>もう 1 つ、ブラウザ側で引っかかった点がある。103 で先読みした CSS はブラウザの HTTP キャッシュに入る。HTML を解析して同じ CSS が必要になったとき、キャッシュが期限切れだと取り直しになり、先読みが無駄になる。</p>
 
 <figure>
   <div class="wrap">
-  <svg viewBox="0 0 760 300" role="img" aria-label="103 で先読みした styles.css は HTTP キャッシュに入る。max-age=0 だと HTML 解析時に再検証が走り 304 になって先読みが無駄になるが、max-age=3600 だとディスクキャッシュから即座に使われ Initiator が early-hints になる">
+  <svg viewBox="0 0 720 200" role="img" aria-label="103 で先読みした CSS はブラウザのキャッシュに入る。Cache-Control が max-age=0 だと HTML 解析時に取り直しになり、max-age=3600 だとキャッシュがそのまま使われる">
     <defs>
-      <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
       </marker>
     </defs>
-    <!-- step 1 -->
-    <rect x="12" y="110" width="110" height="50" rx="6" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)"/>
-    <text x="67" y="131" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">103 受信</text>
-    <text x="67" y="148" font-size="10.5" text-anchor="middle" fill="currentColor">styles.css を取得</text>
-    <line x1="122" y1="135" x2="166" y2="135" stroke="currentColor" marker-end="url(#arr4)"/>
-    <!-- cache -->
-    <rect x="170" y="110" width="110" height="50" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="225" y="131" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">HTTP キャッシュ</text>
-    <text x="225" y="148" font-size="10.5" text-anchor="middle" fill="currentColor">に保存</text>
-    <line x1="280" y1="135" x2="324" y2="135" stroke="currentColor" marker-end="url(#arr4)"/>
-    <!-- parse -->
-    <rect x="328" y="110" width="120" height="50" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
-    <text x="388" y="131" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">HTML 解析</text>
-    <text x="388" y="148" font-size="10.5" text-anchor="middle" fill="currentColor">&lt;link rel=stylesheet&gt;</text>
-    <!-- branch -->
-    <line x1="448" y1="135" x2="490" y2="135" stroke="currentColor"/>
-    <line x1="490" y1="135" x2="490" y2="60" stroke="currentColor"/>
-    <line x1="490" y1="60" x2="530" y2="60" stroke="currentColor" marker-end="url(#arr4)"/>
-    <line x1="490" y1="135" x2="490" y2="222" stroke="currentColor"/>
-    <line x1="490" y1="222" x2="530" y2="222" stroke="currentColor" marker-end="url(#arr4)"/>
-    <text x="452" y="92" font-size="10.5" fill="currentColor" opacity="0.8">max-age=0</text>
-    <text x="452" y="186" font-size="10.5" fill="currentColor" opacity="0.8">max-age=3600</text>
+    <rect x="12" y="76" width="120" height="48" rx="6" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)"/>
+    <text x="72" y="96" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">103 で先読み</text>
+    <text x="72" y="113" font-size="10.5" text-anchor="middle" fill="currentColor">キャッシュに保存</text>
+    <line x1="132" y1="100" x2="176" y2="100" stroke="currentColor" marker-end="url(#arr2)"/>
 
-    <!-- bad branch -->
-    <rect x="534" y="28" width="214" height="66" rx="6" fill="var(--bad)" fill-opacity="0.08" stroke="var(--bad)" stroke-opacity="0.7"/>
-    <text x="641" y="48" font-size="12" font-weight="700" text-anchor="middle" fill="var(--bad)">期限切れ → 再検証</text>
-    <text x="641" y="66" font-size="10.5" text-anchor="middle" fill="currentColor">サーバーへ If-None-Match → 304</text>
-    <text x="641" y="82" font-size="10.5" text-anchor="middle" fill="currentColor">Initiator: Other / 先読みが無駄に</text>
+    <rect x="180" y="76" width="130" height="48" rx="6" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-opacity="0.6"/>
+    <text x="245" y="96" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">HTML 解析</text>
+    <text x="245" y="113" font-size="10.5" text-anchor="middle" fill="currentColor">CSS が必要になる</text>
 
-    <!-- good branch -->
-    <rect x="534" y="190" width="214" height="66" rx="6" fill="var(--good)" fill-opacity="0.08" stroke="var(--good)" stroke-opacity="0.7"/>
-    <text x="641" y="210" font-size="12" font-weight="700" text-anchor="middle" fill="var(--good)">新鮮 → そのまま使用</text>
-    <text x="641" y="228" font-size="10.5" text-anchor="middle" fill="currentColor">ネットワーク往復なし (transferSize 0)</text>
-    <text x="641" y="244" font-size="10.5" text-anchor="middle" fill="currentColor">Initiator: early-hints / Size: disk cache</text>
+    <line x1="310" y1="100" x2="350" y2="100" stroke="currentColor"/>
+    <line x1="350" y1="100" x2="350" y2="46" stroke="currentColor"/>
+    <line x1="350" y1="46" x2="400" y2="46" stroke="currentColor" marker-end="url(#arr2)"/>
+    <line x1="350" y1="100" x2="350" y2="154" stroke="currentColor"/>
+    <line x1="350" y1="154" x2="400" y2="154" stroke="currentColor" marker-end="url(#arr2)"/>
+    <text x="356" y="72" font-size="10.5" fill="currentColor" opacity="0.8">max-age=0</text>
+    <text x="356" y="136" font-size="10.5" fill="currentColor" opacity="0.8">max-age=3600</text>
 
-    <text x="12" y="280" font-size="10.5" fill="currentColor" opacity="0.8">時間 →   103 (70 ms)   …   HTML 到着 (1,100 ms)   …   CSS が必要になる時点</text>
+    <rect x="404" y="22" width="300" height="48" rx="6" fill="var(--bad)" fill-opacity="0.08" stroke="var(--bad)" stroke-opacity="0.7"/>
+    <text x="554" y="42" font-size="12" font-weight="700" text-anchor="middle" fill="var(--bad)">期限切れ。サーバーに取り直す</text>
+    <text x="554" y="60" font-size="10.5" text-anchor="middle" fill="currentColor">先読みが無駄になる</text>
+
+    <rect x="404" y="130" width="300" height="48" rx="6" fill="var(--good)" fill-opacity="0.08" stroke="var(--good)" stroke-opacity="0.7"/>
+    <text x="554" y="150" font-size="12" font-weight="700" text-anchor="middle" fill="var(--good)">キャッシュをそのまま使う</text>
+    <text x="554" y="168" font-size="10.5" text-anchor="middle" fill="currentColor">DevTools の Initiator が Early-hints になる</text>
   </svg>
   </div>
-  <figcaption><strong>preload 対象は十分な <code>Cache-Control</code> を持つ必要がある。</strong> Workers / Pages の静的アセットは既定で <code>max-age=0, must-revalidate</code> なので、<code>_headers</code> で <code>/styles.css</code> に <code>max-age=3600</code> を付けて初めて DevTools の Initiator が <code>Early-hints</code> になった。Chrome のドキュメントも「キャッシュ可能なリソースでなければ 2 回取得される」と注意している(<a href="https://developer.chrome.com/blog/early-hints/">Chrome Developers</a>)。</figcaption>
+  <figcaption><strong>先読み対象には十分な <code>Cache-Control</code> が要る。</strong> Pages の静的ファイルは既定で <code>max-age=0</code> なので、<code>_headers</code> で <code>/styles.css</code> に <code>max-age=3600</code> を付けて初めて効いた。</figcaption>
 </figure>
 
 <!-- ============================================================ -->
-<h2 id="verify">5. 確認方法</h2>
-
-<h3>curl: 103 が先に返るかを見る</h3>
-<p><code>--http2</code> を忘れると HTTP/1.1 になり、絶対に 103 は出ない。</p>
-<pre><code>$ curl -sv --http2 -o /dev/null https://cloudflare-sample-pages.pages.dev/pages-function 2>&amp;1 | grep -E '^&lt; (HTTP|link)'
-<span class="hl">&lt; HTTP/2 103</span>
-<span class="hl">&lt; link: &lt;/styles.css&gt;; as=style; rel=preload</span>
-&lt; HTTP/2 200
-&lt; link: &lt;/styles.css&gt;; rel=preload; as=style</code></pre>
-
-<h3>Chrome DevTools: ブラウザが実際に使ったかを見る</h3>
-<ol>
-  <li>Network パネルで「Disable cache」を<strong>オフ</strong>にする。Early Hints はブラウザキャッシュを経由するので、オンにすると効果が消える。</li>
-  <li>URL バーから対象ページを開く(トップレベルナビゲーションのみ対象。iframe やサブリソースへの 103 は無視される)。</li>
-  <li>ドキュメントの行を選び、Headers タブに「Early hints headers」セクションが出ていれば、Chrome は 103 を受け取っている。</li>
-  <li>一覧の <code>styles.css</code> の Initiator 列が <code>Early-hints</code>、Size が <code>(disk cache)</code> なら、先読みが使われている。</li>
-</ol>
-<p>Console で確定させるなら次を実行する。</p>
-<pre><code>performance.getEntriesByType('resource')
-  .filter(e =&gt; e.name.includes('styles.css'))
-  .map(e =&gt; ({ initiatorType: e.initiatorType, transferSize: e.transferSize }))
-// → [{ initiatorType: <span class="hl">"early-hints"</span>, transferSize: <span class="hl">0</span> }]</code></pre>
-
-<h3>設定: <code>_headers</code> ファイル</h3>
-<p>Workers 静的アセットでも Pages でも、<code>public/_headers</code> に置けばビルド出力にコピーされる。</p>
-<pre><code>/*
-  Link: &lt;/styles.css&gt;; rel=preload; as=style
-
-# 先読みした CSS をブラウザキャッシュから再利用できるようにする
-/styles.css
-  Cache-Control: public, max-age=3600</code></pre>
-<p><code>_headers</code> は静的アセットの応答にしか効かない。SSR やミドルウェアが生成する応答には、Worker コード側で同じ <code>Link</code> ヘッダーを付ける必要がある(<a href="https://developers.cloudflare.com/workers/static-assets/headers/">Workers docs</a>)。</p>
+<h2>3. Chrome DevTools での確認</h2>
+<ul>
+  <li>Network パネルの「Disable cache」を<strong>オフ</strong>にする。オンだと先読みしたキャッシュが使われない。</li>
+  <li>HTML の行を選ぶと、Headers タブに「Early hints headers」が出る。これが 103 で届いた <code>Link</code>。103 を受け取るのは HTML のリクエストだけ。</li>
+  <li><code>styles.css</code> の行の Initiator が <code>Early-hints</code> になる。CSS 自体に 103 が返ったのではなく、「HTML の 103 がきっかけで取りに行った」という意味。Size が <code>(disk cache)</code> なら先読みが使われている。</li>
+</ul>
 
 <!-- ============================================================ -->
-<h2 id="summary">6. まとめ</h2>
-
+<h2>4. 使いどころと注意点</h2>
 <ul>
-  <li><strong>仕組み:</strong> エッジが <code>Link</code> ヘッダーを学習し、次回からオリジン到達前に 103 を返す。オリジン側は <code>Link</code> を付けるだけ。</li>
-  <li><strong>効く場面:</strong> 生成に時間がかかり、キャッシュできない HTML。今日の <code>/pages-function</code> では CSS の取得開始が約 1 秒早まった。</li>
-  <li><strong>効かない場面:</strong> HTML が CDN キャッシュから即答できるページ。103 が出ないのは「すでに速い」というサイン。</li>
-  <li><strong>デプロイ先:</strong> <code>workers.dev</code> では出ない。Pages は自動有効。カスタムドメインはゾーンの Speed 設定で ON にする。</li>
-  <li><strong>学習の遅れ:</strong> デプロイ直後は出ない。今回は約 3 分。</li>
-  <li><strong>preload 対象のキャッシュ:</strong> <code>Cache-Control</code> が短いと再検証が走り、先読みが無駄になる。</li>
-  <li><strong>その他の制約:</strong> HTTP/1.1 不可、クエリ文字列は無視、Chrome は最初の 103 だけ処理、Safari は <code>preconnect</code> のみ。ログに出る <code>ClientRequestSource: earlyHintsCache</code> の 504 はヒント収集のプローブで正常。</li>
+  <li><strong>効く:</strong> SSR など、生成に時間がかかりキャッシュできないページ。</li>
+  <li><strong>効かない:</strong> 静的ファイルや、CDN キャッシュから即座に返るページ。</li>
+  <li><strong>デプロイ先:</strong> <code>workers.dev</code> では出ない。Pages は自動で有効。カスタムドメインは Speed 設定で ON にする。</li>
+  <li><strong>学習待ち:</strong> デプロイ直後は出ない。今回は約 3 分かかった。</li>
+  <li><strong>先読み対象のキャッシュ:</strong> <code>Cache-Control</code> が短いと取り直しになり無駄になる。</li>
+  <li><strong>プロトコルとブラウザ:</strong> HTTP/2 か HTTP/3 のみ。Safari は <code>preconnect</code> だけ対応。</li>
 </ul>
 
-<h3>参考資料</h3>
-<ul class="refs">
-  <li><a href="https://blog.cloudflare.com/early-hints/">Early Hints: How Cloudflare Can Improve Website Load Times by 30%</a> — Cloudflare blog。学習方式の設計意図と効果の数字。</li>
-  <li><a href="https://developers.cloudflare.com/cache/advanced-configuration/early-hints/">Early Hints · Cloudflare Cache docs</a> — 有効化手順、学習の条件、制約、ログの 504 について。</li>
-  <li><a href="https://developers.cloudflare.com/pages/configuration/early-hints/">Early Hints · Cloudflare Pages docs</a> — pages.dev で自動有効、HTML からの <code>Link</code> 自動生成。</li>
-  <li><a href="https://developers.cloudflare.com/workers/examples/103-early-hints/">103 Early Hints · Workers examples</a> — Worker から <code>Link</code> を返す最小例。</li>
-  <li><a href="https://developers.cloudflare.com/workers/static-assets/headers/">Headers · Workers static assets</a> — <code>_headers</code> の書式と制約。</li>
-  <li><a href="https://developer.chrome.com/blog/early-hints/">Faster page loads using server think-time with Early Hints</a> — Chrome Developers。ブラウザ側の制約と DevTools での確認方法。</li>
-  <li><a href="https://www.rfc-editor.org/rfc/rfc8297">RFC 8297: An HTTP Status Code for Indicating Hints</a></li>
-</ul>
-
-<p class="src">検証環境: Astro 7 静的ビルド、Workers 静的アセット(Git 連携ビルド)、Pages(<code>wrangler pages deploy</code>)。コードは <a href="https://github.com/yuheijotaki/cloudflare-sample">yuheijotaki/cloudflare-sample</a>。</p>
+<p class="src">検証コード: <a href="https://github.com/yuheijotaki/cloudflare-sample">yuheijotaki/cloudflare-sample</a></p>
 
 </main>
 </body>
