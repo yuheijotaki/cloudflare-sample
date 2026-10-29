@@ -1,3 +1,7 @@
 # Early Hints 検証用: Cloudflare が rel=preload の Link ヘッダーを学習して 103 で先出しする
 /*
   Link: </styles.css>; rel=preload; as=style
+
+# 103 で先読みした CSS をブラウザキャッシュから再利用できるよう、長めに cache させる
+/styles.css
+  Cache-Control: public, max-age=3600
