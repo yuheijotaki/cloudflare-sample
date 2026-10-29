@@ -1,0 +1,3 @@
+# Early Hints 検証用: Cloudflare が rel=preload の Link ヘッダーを学習して 103 で先出しする
+/*
+  Link: </styles.css>; rel=preload; as=style
