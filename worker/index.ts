@@ -1,5 +1,5 @@
 // Early Hints 検証用 Worker。
-// /slow だけ Worker が先に処理し、HTML の返却を意図的に遅らせる。
+// /worker だけ Worker が先に処理し、HTML の返却を意図的に遅らせる。
 // それ以外のパスは Astro のビルド成果物(静的アセット)をそのまま配信する。
 interface Env {
   ASSETS: Fetcher;
@@ -11,10 +11,10 @@ const SLOW_HTML = `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/styles.css" />
-    <title>Early Hints 検証 (slow)</title>
+    <title>Early Hints 検証 (Worker)</title>
   </head>
   <body>
-    <h1>Early Hints 検証 (slow)</h1>
+    <h1>Early Hints 検証 (Worker)</h1>
     <p>この HTML は Worker 側で 1 秒待ってから返しています。</p>
   </body>
 </html>`;
@@ -22,7 +22,7 @@ const SLOW_HTML = `<!doctype html>
 export default {
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === "/slow") {
+    if (url.pathname === "/worker") {
       await new Promise((r) => setTimeout(r, 1000));
       return new Response(SLOW_HTML, {
         headers: {

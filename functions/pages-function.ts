@@ -1,14 +1,14 @@
-// Pages Functions 版: /slow の HTML を 1 秒遅らせて返す(Early Hints 検証用)
+// Pages Functions 版: /pages-function の HTML を 1 秒遅らせて返す(Early Hints 検証用)
 const SLOW_HTML = `<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/styles.css" />
-    <title>Early Hints 検証 (slow)</title>
+    <title>Early Hints 検証 (Pages Function)</title>
   </head>
   <body>
-    <h1>Early Hints 検証 (slow)</h1>
+    <h1>Early Hints 検証 (Pages Function)</h1>
     <p>この HTML は Pages Function 側で 1 秒待ってから返しています。</p>
   </body>
 </html>`;

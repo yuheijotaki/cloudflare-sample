@@ -169,7 +169,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
     <text x="120" y="262" font-size="11" fill="currentColor" opacity="0.8">Link: &lt;/styles.css&gt;; rel=preload; as=style  を 103 で先に受け取る</text>
   </svg>
   </div>
-  <figcaption><strong>今日の <code>/slow</code> での実測。</strong> 103 は約 70 ms、HTML 本体は約 1,100 ms で到着した。差の約 1 秒がそのまま CSS の先読みに使える時間になる。Cloudflare は初回訪問者のページロードで 30% 以上の改善を報告している(<a href="https://blog.cloudflare.com/early-hints/">Cloudflare blog</a>)。</figcaption>
+  <figcaption><strong>今日の <code>/pages-function</code> での実測。</strong> 103 は約 70 ms、HTML 本体は約 1,100 ms で到着した。差の約 1 秒がそのまま CSS の先読みに使える時間になる。Cloudflare は初回訪問者のページロードで 30% 以上の改善を報告している(<a href="https://blog.cloudflare.com/early-hints/">Cloudflare blog</a>)。</figcaption>
 </figure>
 
 <p>対応はブラウザ側にも必要で、Chrome は 103 以降デフォルトで有効。HTTP/2 または HTTP/3 のみで動作し、HTTP/1.1 では無視される(<a href="https://developer.chrome.com/blog/early-hints/">Chrome Developers</a>)。Safari は <code>preconnect</code> のみ対応で <code>preload</code> は未対応。</p>
@@ -211,7 +211,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
     <text x="50" y="62" font-size="10.5" text-anchor="middle" fill="currentColor">1 回目: 学習</text>
     <!-- request -->
     <line x1="104" y1="70" x2="376" y2="70" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="64" font-size="11" text-anchor="middle" fill="currentColor">GET /slow</text>
+    <text x="240" y="64" font-size="11" text-anchor="middle" fill="currentColor">GET /pages-function</text>
     <line x1="384" y1="70" x2="656" y2="70" stroke="currentColor" marker-end="url(#arr2)"/>
     <!-- response -->
     <line x1="656" y1="118" x2="384" y2="118" stroke="currentColor" marker-end="url(#arr2)"/>
@@ -226,7 +226,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
     <rect x="12" y="208" width="76" height="20" rx="10" fill="var(--accent)"/>
     <text x="50" y="222" font-size="10.5" text-anchor="middle" fill="#fff">2 回目以降</text>
     <line x1="104" y1="230" x2="376" y2="230" stroke="currentColor" marker-end="url(#arr2)"/>
-    <text x="240" y="224" font-size="11" text-anchor="middle" fill="currentColor">GET /slow</text>
+    <text x="240" y="224" font-size="11" text-anchor="middle" fill="currentColor">GET /pages-function</text>
     <!-- 103 immediately -->
     <line x1="376" y1="256" x2="104" y2="256" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrA)"/>
     <text x="240" y="250" font-size="11" text-anchor="middle" fill="var(--accent)" font-weight="700">103 + Link (約 70 ms)</text>
@@ -321,7 +321,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
     <!-- pass row -->
     <rect x="135" y="240" width="576" height="60" rx="4" fill="var(--good)" fill-opacity="0.08" stroke="var(--good)" stroke-opacity="0.6"/>
     <text x="150" y="262" font-size="11" font-weight="700" fill="var(--good)">pages.dev は 3 つとも通過</text>
-    <text x="150" y="280" font-size="11" fill="currentColor">Pages は Early Hints が自動で有効(関門 1)、Pages Function の /slow は no-store でキャッシュされない(関門 2)、</text>
+    <text x="150" y="280" font-size="11" fill="currentColor">Pages は Early Hints が自動で有効(関門 1)、Pages Function の /pages-function は no-store でキャッシュされない(関門 2)、</text>
     <text x="150" y="294" font-size="11" fill="currentColor">デプロイ 3 分後にヒントが学習済み(関門 3)。静的な / も cf-cache-status が付かず 103 が出た。</text>
   </svg>
   </div>
@@ -332,8 +332,8 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 <table>
   <thead><tr><th>環境</th><th>ゾーン</th><th>Link ヘッダー</th><th>103</th><th>止まった関門</th></tr></thead>
   <tbody>
-    <tr><td><code>cloudflare-sample.yuheijotaki.workers.dev</code><br><span class="src">Workers 静的アセット + 1 秒遅延の /slow</span></td><td>workers.dev(Cloudflare 所有)</td><td>あり</td><td class="no">出ない</td><td>1</td></tr>
-    <tr><td><code>cloudflare-sample-pages.pages.dev</code><br><span class="src">同じ dist + Pages Function の /slow</span></td><td>pages.dev(自動有効)</td><td>あり</td><td class="yes">出る</td><td>なし</td></tr>
+    <tr><td><code>cloudflare-sample.yuheijotaki.workers.dev</code><br><span class="src">Workers 静的アセット + 1 秒遅延の /worker</span></td><td>workers.dev(Cloudflare 所有)</td><td>あり</td><td class="no">出ない</td><td>1</td></tr>
+    <tr><td><code>cloudflare-sample-pages.pages.dev</code><br><span class="src">同じ dist + Pages Function の /pages-function</span></td><td>pages.dev(自動有効)</td><td>あり</td><td class="yes">出る</td><td>なし</td></tr>
     <tr><td><code>recruit.smarthr.co.jp</code><br><span class="src">Workers + カスタムドメイン、HTML を CDN キャッシュ</span></td><td>smarthr.co.jp(自社)</td><td>あり(preconnect)</td><td class="no">観測できず</td><td>2(外からは 1 と区別不能)</td></tr>
   </tbody>
 </table>
@@ -402,7 +402,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 
 <h3>curl: 103 が先に返るかを見る</h3>
 <p><code>--http2</code> を忘れると HTTP/1.1 になり、絶対に 103 は出ない。</p>
-<pre><code>$ curl -sv --http2 -o /dev/null https://cloudflare-sample-pages.pages.dev/slow 2>&amp;1 | grep -E '^&lt; (HTTP|link)'
+<pre><code>$ curl -sv --http2 -o /dev/null https://cloudflare-sample-pages.pages.dev/pages-function 2>&amp;1 | grep -E '^&lt; (HTTP|link)'
 <span class="hl">&lt; HTTP/2 103</span>
 <span class="hl">&lt; link: &lt;/styles.css&gt;; as=style; rel=preload</span>
 &lt; HTTP/2 200
@@ -436,7 +436,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 
 <ul>
   <li><strong>仕組み:</strong> エッジが <code>Link</code> ヘッダーを学習し、次回からオリジン到達前に 103 を返す。オリジン側は <code>Link</code> を付けるだけ。</li>
-  <li><strong>効く場面:</strong> 生成に時間がかかり、キャッシュできない HTML。今日の <code>/slow</code> では CSS の取得開始が約 1 秒早まった。</li>
+  <li><strong>効く場面:</strong> 生成に時間がかかり、キャッシュできない HTML。今日の <code>/pages-function</code> では CSS の取得開始が約 1 秒早まった。</li>
   <li><strong>効かない場面:</strong> HTML が CDN キャッシュから即答できるページ。103 が出ないのは「すでに速い」というサイン。</li>
   <li><strong>デプロイ先:</strong> <code>workers.dev</code> では出ない。Pages は自動有効。カスタムドメインはゾーンの Speed 設定で ON にする。</li>
   <li><strong>学習の遅れ:</strong> デプロイ直後は出ない。今回は約 3 分。</li>
